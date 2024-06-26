@@ -1,0 +1,5 @@
+#!/bin/bash
+sudo cd /root
+sudo wget https://saxtonator-bucket.s3.amazonaws.com/git-setup.sh
+sudo chmod 755 git-setup.sh
+sudo bash git-setup.sh
