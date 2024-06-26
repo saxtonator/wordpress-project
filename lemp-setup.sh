@@ -11,3 +11,5 @@ systemctl status mariadb >> /root/testing.txt
 sudo apt -y install php php-cli php-common php-imap php-fpm php-snmp php-xml php-zip php-mbstring php-curl php-mysqli php-gd php-intl
 sudo php -v >> /root/testing.txt
 sudo mv /var/www/html/index.html /var/www/html/index.html.old # rename apache testing page
+sudo cd /root
+sudo bash wordpress-install.sh
