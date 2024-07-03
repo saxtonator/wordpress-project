@@ -2,7 +2,7 @@
 sudo rm -rf /var/www/html
 sudo apt -y install unzip
 sudo wget -O /var/www/latest.zip https://wordpress.org/latest.zip
-sudo unzip /var/www/latest.zip
+sudo unzip /var/www/latest.zip -d /var/www/
 sudo rm /var/www/latest.zip
 sudo mv /var/www/wordpress /var/www/html 
 # sudo mariadb -u root
