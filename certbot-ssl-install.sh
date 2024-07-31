@@ -14,3 +14,8 @@ sudo certbot --nginx --non-interactive --agree-tos --email $EMAIL
 # Nginx unit test that will reload Nginx to apply changes ONLY if the test is successful
 sudo nginx -t && systemctl reload nginx
 
+# Run the WordPress installation scrip
+
+sudo bash /root/wordpress-project/wordpress-install.sh
+
+
