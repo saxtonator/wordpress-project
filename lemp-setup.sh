@@ -8,6 +8,10 @@ sudo systemctl start mariadb && sudo systemctl enable mariadb
 systemctl status mariadb >> /root/testing.txt
 sudo apt -y install php php-cli php-common php-imap php-fpm php-snmp php-xml php-zip php-mbstring php-curl php-mysqli php-gd php-intl
 sudo php -v >> /root/testing.txt
+sudo systemctl stop apache2 # stops apache because we're aleady using nginx
+sudo systemctl disable apache2 # disables apache from starting on a server reboot
+# command to fully remove apache2
+# sudo sudo apt remove --purge apache2
 sudo mv /var/www/html/index.html /var/www/html/index.html.old # rename apache testing page
 sudo mv /root/wordpress-project/nginx.conf /etc/nginx/conf.d/nginx.conf
 dns_record=$(curl -s icanhazip.com | sed 's/^/ec2-/; s/\./-/g; s/$/.compute-1.amazonaws.com/')
