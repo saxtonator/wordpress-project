@@ -18,4 +18,7 @@ sudo nginx -t && systemctl reload nginx
 
 sudo bash /root/wordpress-project/wordpress-install.sh
 
+# command to test the installation of new certs. You can only install 50 per week per domain.
+# sudo certbot renew --dry-run
+
 
