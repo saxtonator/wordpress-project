@@ -20,15 +20,15 @@ my_domain=wordpress.danhavercroft.co.uk
 elastic_ip=$(curl -s icanhazip.com)
 
 CF_API=
-CF_ZONE_ID=74fcc4fb536fa9248309e2de93e10a7a
+CF_ZONE_ID=
 
 curl --request POST \
   --url https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records \
   --header 'Content-Type: application/json' \
-  --header "Authorization: Bearer $CF_API"
+  --header "Authorization: Bearer $CF_API" \
   --data '{
-  "content": "$elastic_ip",
-  "name": "$my_domain",
+  "content": "'"$elastic_ip"'",
+  "name": "'"$my_domain"'",
   "proxied": true,
   "type": "A",
   "comment": "Automatically adding A record",
