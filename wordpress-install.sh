@@ -7,8 +7,8 @@ sudo rm /var/www/latest.zip
 sudo mv /var/www/wordpress /var/www/html
 
 # Generate password for use in WP DB
-password=$(tr -dc 'A-Za-z0-9!' < /dev/urandom | head -c 25)
-username=$(tr -dc 'A-Za-z0-9!' < /dev/urandom | head -c 25)
+password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 25)
+username=$(tr -dc 'A-Za-z' < /dev/urandom | head -c 25)
 
 echo $password > creds.txt
 echo $username >> creds.txt
