@@ -28,7 +28,7 @@ check_exit_status "apt upgrade"
 
 # Clone the GitHub repository
 echo "Cloning GitHub repository..." | tee -a $LOG_FILE
-sudo git clone https://github.com/saxtonator/wordpress-project.git /root/wordpress-project
+sudo git clone https://github.com/danHavercroft/wordpress-project.git /root/wordpress-project
 check_exit_status "git clone"
 
 # Change permissions of the cloned repository
@@ -38,5 +38,6 @@ check_exit_status "chmod"
 
 # Run the setup script
 echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
-sudo bash /root/wordpress-project/lemp-setup.sh
-check_exit_status "lemp-setup.sh script"
+
+# sudo bash /root/wordpress-project/lemp-setup.sh
+# check_exit_status "lemp-setup.sh script"
