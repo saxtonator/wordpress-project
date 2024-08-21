@@ -14,7 +14,10 @@ sudo systemctl disable apache2 # disables apache from starting on a server reboo
 # sudo apt remove --purge apache2
 sudo mv /var/www/html/index.html /var/www/html/index.html.old # rename apache testing page
 sudo mv /root/wordpress-project/nginx.conf /etc/nginx/conf.d/nginx.conf
-dns_record=$(curl -s icanhazip.com | sed 's/^/ec2-/; s/\./-/g; s/$/.compute-1.amazonaws.com/')
-sed -i "s/SERVERNAME/$dns_record/g" /etc/nginx/conf.d/nginx.conf
+
+# dns_record=$(curl -s icanhazip.com | sed 's/^/ec2-/; s/\./-/g; s/$/.compute-1.amazonaws.com/')
+my_domain=wordpress.danhavercroft.co.uk
+
+sed -i "s/SERVERNAME/$my_domain/g" /etc/nginx/conf.d/nginx.conf
 nginx -t && systemctl reload nginx # this will only reload nginx if the test is successful
 sudo bash /root/wordpress-project/certbot-ssl-install.sh
