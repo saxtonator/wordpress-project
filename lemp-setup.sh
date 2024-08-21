@@ -17,6 +17,24 @@ sudo mv /root/wordpress-project/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # dns_record=$(curl -s icanhazip.com | sed 's/^/ec2-/; s/\./-/g; s/$/.compute-1.amazonaws.com/')
 my_domain=wordpress.danhavercroft.co.uk
+elastic_ip=$(curl -s icanhazip.com)
+
+CF_API=
+CF_ZONE_ID=74fcc4fb536fa9248309e2de93e10a7a
+
+curl --request POST \
+  --url https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records \
+  --header 'Content-Type: application/json' \
+  --header "Authorization: Bearer $CF_API"
+  --data '{
+  "content": "$elastic_ip",
+  "name": "$my_domain",
+  "proxied": true,
+  "type": "A",
+  "comment": "Automatically adding A record",
+  "tags": [],
+  "ttl": 3600
+}'
 
 sed -i "s/SERVERNAME/$my_domain/g" /etc/nginx/conf.d/nginx.conf
 nginx -t && systemctl reload nginx # this will only reload nginx if the test is successful
