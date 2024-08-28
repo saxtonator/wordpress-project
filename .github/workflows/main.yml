@@ -1,0 +1,40 @@
+name: Test and Deploy Bash Script
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Bash script tests
+      run: |
+        chmod +x ./my_script.sh &&  ./my_script.sh
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Debug SSH connection
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+        chmod 600 private_key
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "echo 'SSH Connection Successful'"
+
+    - name: Copy files to VM
+      run: |
+        scp -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.PORT }} my_script.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/root
+
+    - name: Run script on remote server
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} 'sh /root/my_script.sh'
