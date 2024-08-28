@@ -28,7 +28,7 @@ jobs:
         sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./lemp-setup.sh
         sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./lemp-setup.sh
         sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./certbot-ssl-install.sh
-        sed -i 's/REPLACE_DOMAIN/${{ secrets.EMAIL }}/g' ./certbot-ssl-install.sh
+        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./certbot-ssl-install.sh
 
     - name: Copy files to VM
       run: |
