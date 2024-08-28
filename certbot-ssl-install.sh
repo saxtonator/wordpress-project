@@ -7,7 +7,7 @@ sudo apt install -y certbot python3-certbot-nginx
 
 # Define your email
 EMAIL=REPLACE_EMAIL
-DOMAIN=REPLACE_DOMAINs
+DOMAIN=REPLACE_DOMAIN
 
 # Use Certbot to obtain and install the SSL certificate
 sudo certbot --nginx --non-interactive --agree-tos --email $EMAIL -d $DOMAIN
