@@ -3,7 +3,7 @@ name: Test and Deploy Bash Script
 on:
   push:
     branches:
-      - setup
+      - main
 
 # environment variables no longer needed because we're using the sed command and replacing directly in the scripts.
 # env:
