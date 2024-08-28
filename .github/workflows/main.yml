@@ -22,7 +22,7 @@ jobs:
       run: |
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
         chmod 600 private_key
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'SSH Connection Successful'"
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "echo 'SSH Connection Successful'"
 
     - name: Edit Script Variables
       run: |
@@ -35,16 +35,16 @@ jobs:
         
     - name: Copy files to VM
       run: |
-        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~
+        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~
 
     - name: Run LEMP Setup
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} 'sudo sh /home/ubuntu/wordpress-project/lemp-setup.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/lemp-setup.sh'
 
     - name: Run certbot install
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} 'sudo sh /home/ubuntu/wordpress-project/certbot-ssl-install.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/certbot-ssl-install.sh'
 
     - name: Run Wordpress install
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} 'sudo sh /home/ubuntu/wordpress-project/wordpress-install.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/wordpress-install.sh'
