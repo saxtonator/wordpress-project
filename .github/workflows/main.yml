@@ -5,9 +5,10 @@ on:
     branches:
       - setup
 
-env:
-  CF_API: ${{ secrets.CF_API }}
-  CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+# environment variables no longer needed because we're using the sed command and replacing directly in the scripts.
+# env:
+ # CF_API: ${{ secrets.CF_API }}
+ # CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
 
 jobs:
   deploy:
