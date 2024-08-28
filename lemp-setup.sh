@@ -38,4 +38,4 @@ curl --request POST \
 
 sed -i "s/SERVERNAME/$my_domain/g" /etc/nginx/conf.d/nginx.conf
 nginx -t && systemctl reload nginx # this will only reload nginx if the test is successful
-sudo bash /root/wordpress-project/certbot-ssl-install.sh
+# sudo bash /root/wordpress-project/certbot-ssl-install.sh
