@@ -13,7 +13,7 @@ sudo systemctl disable apache2 # disables apache from starting on a server reboo
 # command to fully remove apache2
 # sudo apt remove --purge apache2
 sudo mv /var/www/html/index.html /var/www/html/index.html.old # rename apache testing page
-sudo mv /root/wordpress-project/nginx.conf /etc/nginx/conf.d/nginx.conf
+sudo mv /home/ubuntu/wordpress-project/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # dns_record=$(curl -s icanhazip.com | sed 's/^/ec2-/; s/\./-/g; s/$/.compute-1.amazonaws.com/')
 my_domain=REPLACE_DOMAIN
