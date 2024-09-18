@@ -1,18 +1,25 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  CloudFormation template to create EC2 instance with security group
+  # CloudFormation template to create EC2 instance with security group
 
 Resources:
+  # Defines the EC2 instance resource
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
+      # Availability Zone where the instance will be launched
       AvailabilityZone: us-east-1a
+      # AMI ID for the EC2 instance, represents the OS and software package
       ImageId: ami-04a81a99f5ec58529
+      # Instance type, t2.micro is a low-cost, general-purpose instance
       InstanceType: t2.micro
+      # Security groups that control traffic in and out of the instance
       SecurityGroups:
-        - !Ref SSHSecurityGroup
-        - !Ref ServerSecurityGroup
+        - !Ref SSHSecurityGroup  # Reference to a predefined security group (to be defined elsewhere)
+        - !Ref ServerSecurityGroup  # Reference to a second security group
+      # SSH key pair used to connect to the instance securely
       KeyName: sax-admin
+      # UserData script that runs automatically when the instance starts, Base64 encoded
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -53,37 +60,41 @@ Resources:
           sudo chmod -R 755 /root/wordpress-project
           check_exit_status "chmod"
 
-          # Run the setup script
+          # Run the setup script from the cloned repository
           echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
           sudo bash /root/wordpress-project/lemp-setup.sh
           check_exit_status "lemp-setup.sh script"
 
-  # Elastic IP resource
+  # Elastic IP resource, provides a static public IP address to the instance
   MyElasticIP:
     Type: AWS::EC2::EIP
 
-  # Elastic IP association with the instance
+  # Associates the Elastic IP with the EC2 instance
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
+      # Associate the EIP with the EC2 instance
       InstanceId: !Ref MyInstance
+      # Reference the Elastic IP to associate with the instance
       EIP: !Ref MyElasticIP
 
-  # EC2 security group with ports 22, 80, and 443
+  # Defines the security group that controls network access to the EC2 instance
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      # Description of the security group
       GroupDescription: Enable access via ports 22, 80, and 443
+      # Ingress rules to allow inbound traffic
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 22
+          FromPort: 22  # Allows SSH access on port 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0  # Open to all IP addresses (not recommended for production)
         - IpProtocol: tcp
-          FromPort: 80
+          FromPort: 80  # Allows HTTP traffic on port 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0  # Open to all IP addresses
         - IpProtocol: tcp
-          FromPort: 443
+          FromPort: 443  # Allows HTTPS traffic on port 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0  # Open to all IP addresses
