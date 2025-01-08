@@ -5,11 +5,6 @@ on:
     branches:
       - main
 
-# environment variables no longer needed because we're using the sed command and replacing directly in the scripts.
-# env:
- # CF_API: ${{ secrets.CF_API }}
- # CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,25 +21,17 @@ jobs:
 
     - name: Edit Script Variables
       run: |
-        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_MY_ELASTIC_IP/${{ secrets.MY_ELASTIC_IP }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./certbot-ssl-install.sh
-        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./certbot-ssl-install.sh
+        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_MY_ELASTIC_IP/${{ secrets.MY_ELASTIC_IP }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./bash_scripts/frontend.sh
         
     - name: Copy files to VM
       run: |
         scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~
 
-    - name: Run LEMP Setup
+    - name: Run setup script
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/lemp-setup.sh'
-
-    - name: Run certbot install
-      run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/certbot-ssl-install.sh'
-
-    - name: Run Wordpress install
-      run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/wordpress-install.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/bash_scripts/frontend.sh'
