@@ -17,12 +17,12 @@ jobs:
       run: |
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
         chmod 600 private_key
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "echo 'SSH Connection Successful'"
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_IP }} "echo 'SSH Connection Successful'"
 
     - name: Edit Script Variables
       run: |
         sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./bash_scripts/frontend.sh
-        sed -i 's/REPLACE_MY_ELASTIC_IP/${{ secrets.MY_ELASTIC_IP }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_FRONTEND_IP/${{ secrets.FRONTEND_IP }}/g' ./bash_scripts/frontend.sh
         sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./bash_scripts/frontend.sh
         sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./bash_scripts/frontend.sh
         sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./bash_scripts/frontend.sh
@@ -30,8 +30,22 @@ jobs:
         
     - name: Copy files to VM
       run: |
-        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~
+        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_IP }}:~
 
     - name: Run setup script
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/wordpress-project/bash_scripts/frontend.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_IP }} 'sudo sh /home/ubuntu/wordpress-project/bash_scripts/frontend.sh'
+
+
+      # Backend
+    - name: Debug BE SSH connection
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.BACKEND_IP }} "echo 'SSH Connection Successful'"
+        
+    - name: Copy BE files to VM
+      run: |
+        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.BACKEND_IP }}:~
+
+    - name: Run BE setup script
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.BACKEND_IP }} 'sudo sh /home/ubuntu/wordpress-project/bash_scripts/backend.sh'
