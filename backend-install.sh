@@ -39,7 +39,7 @@ sudo mysql -e "GRANT ALL PRIVILEGES ON $username.* TO '$username'@'localhost'"
 sudo mysql -e "FLUSH PRIVILEGES"
 
 # Install the AWS CLI tool using Snap for managing AWS resources
-snap install -y aws-cli --classic
+snap install aws-cli --classic
 
 # Upload the creds.txt file to the specified S3 bucket
 # This securely stores the credentials file in AWS S3 for later use or backup
