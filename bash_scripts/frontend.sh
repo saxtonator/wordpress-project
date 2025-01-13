@@ -30,6 +30,9 @@ log "Running apt upgrade..."
 sudo apt -y upgrade
 check_exit_status "apt upgrade"
 
+# Install the AWS CLI tool using Snap for managing AWS resources
+snap install aws-cli --classic
+
 # Clone the GitHub repository
 log "Cloning GitHub repository..."
 sudo git clone https://github.com/saxtonator/wordpress-project.git /root/wordpress-project
