@@ -6,6 +6,9 @@
 # Update the package lists for upgrades and install the latest available versions
 apt -y update && apt -y upgrade
 
+# Install the AWS CLI tool using Snap for managing AWS resources
+snap install aws-cli --classic
+
 # Install MariaDB server and client packages without user interaction
 apt install mariadb-server mariadb-client -y
 
@@ -37,9 +40,6 @@ sudo mysql -e "GRANT ALL PRIVILEGES ON $username.* TO '$username'@'localhost'"
 
 # Refresh MariaDB privileges to apply changes immediately
 sudo mysql -e "FLUSH PRIVILEGES"
-
-# Install the AWS CLI tool using Snap for managing AWS resources
-snap install aws-cli --classic
 
 # Add the password and username to the wp-config.php file
 sed -i "s/password_here/$password/g" /var/www/html/wp-config.php
