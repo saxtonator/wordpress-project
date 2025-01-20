@@ -41,6 +41,11 @@ sudo mysql -e "FLUSH PRIVILEGES"
 # Install the AWS CLI tool using Snap for managing AWS resources
 snap install aws-cli --classic
 
+# Add the password and username to the wp-config.php file
+sed -i "s/password_here/$password/g" /var/www/html/wp-config.php
+sed -i "s/username_here/$username/g" /var/www/html/wp-config.php
+sed -i "s/database_name_here/$username/g" /var/www/html/wp-config.php
+
 # Upload the creds.txt file to the specified S3 bucket
 # This securely stores the credentials file in AWS S3 for later use or backup
 aws s3 cp creds.txt s3://saxtonator
