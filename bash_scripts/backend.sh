@@ -48,7 +48,11 @@ sed -i "s/database_name_here/$username/g" /var/www/html/wp-config.php
 
 # Upload the creds.txt file to the specified S3 bucket
 # This securely stores the credentials file in AWS S3 for later use or backup
-aws s3 cp creds.txt s3://saxtonator
+aws s3 cp /root/creds.txt s3://saxtonator
+
+# Backup of my DB and stored on S3 for backup and security
+mysqldump -u root -p --all-databases > /root/alldb.sql
+aws s3 cp /root/alldb.sql s3://saxtonator
 
 # Instructions to Create an IAM Role for EC2:
 # ===========================================
