@@ -22,7 +22,7 @@ jobs:
     - name: Edit Script Variables
       run: |
         sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./bash_scripts/frontend.sh
-        sed -i 's/REPLACE_FRONTEND_IP/${{ secrets.FRONTEND_IP }}/g' ./bash_scripts/frontend.sh
+        sed -i 's/REPLACE_FRONTEND_IP/${{ secrets.FRONTEND_IP }}/g' ./bash_scripts/backend.sh
         sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./bash_scripts/frontend.sh
         sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./bash_scripts/frontend.sh
         sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./bash_scripts/frontend.sh
