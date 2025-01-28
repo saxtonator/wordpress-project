@@ -24,6 +24,10 @@ systemctl restart mariadb
 password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 25)
 username=$(tr -dc 'A-Za-z' < /dev/urandom | head -c 25)
 
+# Password and username using Github secrets. Replace DBPASSWORD and DBUSERNAME with your secret.
+# password=DBPASSWORD
+# username=DBUSERNAME
+
 # Save the generated credentials to a file for later use
 # 'creds.txt' will contain the password and username on separate lines
 echo $password > creds.txt
