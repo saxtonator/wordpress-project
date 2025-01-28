@@ -37,10 +37,10 @@ echo $username >> creds.txt
 sudo mysql -e "CREATE DATABASE IF NOT EXISTS $username"
 
 # Create a new MariaDB user with the generated username and password
-sudo mysql -e "CREATE USER IF NOT EXISTS '$username'@'localhost' IDENTIFIED BY '$password'"
+sudo mysql -e "CREATE USER IF NOT EXISTS '$username'@'FRONTEND_IP' IDENTIFIED BY '$password'"
 
 # Grant the new user full privileges on their database
-sudo mysql -e "GRANT ALL PRIVILEGES ON $username.* TO '$username'@'localhost'"
+sudo mysql -e "GRANT ALL PRIVILEGES ON $username.* TO '$username'@'FRONTEND_IP'"
 
 # Refresh MariaDB privileges to apply changes immediately
 sudo mysql -e "FLUSH PRIVILEGES"
