@@ -62,7 +62,7 @@ sudo mv /home/ubuntu/wordpress-project/configs/nginx.conf /etc/nginx/conf.d/ngin
 
 # dns_record=$(curl -s icanhazip.com | sed 's/^/ec2-/; s/\./-/g; s/$/.compute-1.amazonaws.com/')
 my_domain=REPLACE_DOMAIN
-elastic_ip=REPLACE_MY_ELASTIC_IP
+elastic_ip=REPLACE_FRONTEND_IP
 
 CF_API=REPLACE_CF_API
 CF_ZONE_ID=REPLACE_CF_ZONE_ID
@@ -117,7 +117,28 @@ sudo mv /var/www/wordpress /var/www/html
 sudo mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 sudo chmod 640 /var/www/html/wp-config.php 
 sudo chown -R www-data:www-data /var/www/html/
+sudo find /var/www/html/ -type d -exec chmod 0755 {} \;
+sudo find /var/www/html/ -type f -exec chmod 0644 {} \;
+
+# Update wp-config.php with the database credentials
+sed -i "s/username_here/REPLACE_DBUSERNAME/g" /var/www/html/wp-config.php
+sed -i "s/password_here/REPLACE_DBPASSWORD/g" /var/www/html/wp-config.php
+sed -i "s/database_name_here/REPLACE_DBUSERNAME/g" /var/www/html/wp-config.php
+sed -i "s/localhost/REPLACE_BACKEND_IP/g" /var/www/html/wp-config.php
 
 SALT=$(curl -L https://api.wordpress.org/secret-key/1.1/salt/)
 STRING='put your unique phrase here'
 printf '%s\n' "g/$STRING/d" a "$SALT" . w | ed -s /var/www/html/wp-config.php
+
+# Install the AWS CLI tool using Snap for managing AWS resources
+snap install aws-cli --classic
+
+# This securely backsup and stores the wp-config.php credentials on S3
+aws s3 cp /var/www/html/wp-config.php s3://saxtonator
+
+# Install chkrootkit vulnerability scanning tool
+sudo apt update
+sudo apt install chkrootkit -y
+
+# Run chrootkit scanning tool
+sudo chkrootkit > chkrootkit_scan_output.txt
