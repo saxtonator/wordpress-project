@@ -55,7 +55,7 @@ sed -i "s/database_name_here/$username/g" /var/www/html/wp-config.php
 aws s3 cp /root/creds.txt s3://saxtonator
 
 # Backup of my DB and stored on S3 for backup and security. Please specify your DBNAME. Consider using compression.
-mysqldump -u root -p $username /tmp/wordpressDB.sql
+mysqldump -u root -p $username > /tmp/wordpressDB.sql
 aws s3 cp /tmp/wordpressDB.sql s3://saxtonator
 
 # Restore your DB
