@@ -141,4 +141,4 @@ sudo apt update
 sudo apt install chkrootkit -y
 
 # Run chrootkit scanning tool
-sudo chkrootkit > chkrootkit_scan_output.txt
+sudo chkrootkit > vulnerability_scan_output.txt
