@@ -21,12 +21,12 @@ systemctl restart mariadb
 
 # Generate a random password and username for the WordPress database
 # 'tr -dc' removes unwanted characters, and 'head -c 25' limits output to 25 characters
-password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 25)
-username=$(tr -dc 'A-Za-z' < /dev/urandom | head -c 25)
+# password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 25)
+# username=$(tr -dc 'A-Za-z' < /dev/urandom | head -c 25)
 
 # Uncomment to use your password and username using Github secrets. Replace DBPASSWORD and DBUSERNAME with your secret.
-# password=DBPASSWORD
-# username=DBUSERNAME
+username=REPLACE_DBUSERNAME
+password=REPLACE_DBPASSWORD
 
 # Save the generated credentials to a file for later use
 # 'creds.txt' will contain the password and username on separate lines
@@ -37,10 +37,10 @@ echo $username >> creds.txt
 sudo mysql -e "CREATE DATABASE IF NOT EXISTS $username"
 
 # Create a new MariaDB user with the generated username and password
-sudo mysql -e "CREATE USER IF NOT EXISTS '$username'@'FRONTEND_IP' IDENTIFIED BY '$password'"
+sudo mysql -e "CREATE USER IF NOT EXISTS '$username'@'REPLACE_FRONTEND_IP' IDENTIFIED BY '$password'"
 
 # Grant the new user full privileges on their database
-sudo mysql -e "GRANT ALL PRIVILEGES ON $username.* TO '$username'@'FRONTEND_IP'"
+sudo mysql -e "GRANT ALL PRIVILEGES ON $username.* TO '$username'@'REPLACE_FRONTEND_IP'"
 
 # Refresh MariaDB privileges to apply changes immediately
 sudo mysql -e "FLUSH PRIVILEGES"
@@ -54,9 +54,13 @@ sed -i "s/database_name_here/$username/g" /var/www/html/wp-config.php
 # This securely stores the credentials file in AWS S3 for later use or backup
 aws s3 cp /root/creds.txt s3://saxtonator
 
-# Backup of my DB and stored on S3 for backup and security
-mysqldump -u root -p --all-databases > /root/alldb.sql
-aws s3 cp /root/alldb.sql s3://saxtonator
+# Backup of my DB and stored on S3 for backup and security. Please specify your DBNAME. Consider using compression.
+mysqldump -u root -p $username /tmp/wordpressDB.sql
+aws s3 cp /tmp/wordpressDB.sql s3://saxtonator
+
+# Restore your DB
+# aws s3 cp s3://saxtonator/wordpressDB.sql /tmp/wordpressDB.sql
+# sudo mysql $username < /tmp/wordpressDB.sql
 
 # Instructions to Create an IAM Role for EC2:
 # ===========================================
