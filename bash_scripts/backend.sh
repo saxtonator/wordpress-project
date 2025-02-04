@@ -16,8 +16,8 @@ apt install mariadb-server mariadb-client -y
 # This changes the bind-address setting to 0.0.0.0 (listen on all interfaces)
 sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
 
-# Restart the MariaDB service to apply the configuration changes
-systemctl restart mariadb
+# Restart the MariaDB service to apply the configuration changes and verify status with error checking
+mysqladmin ping && systemctl restart mariadb
 
 # Generate a random password and username for the WordPress database
 # 'tr -dc' removes unwanted characters, and 'head -c 25' limits output to 25 characters
