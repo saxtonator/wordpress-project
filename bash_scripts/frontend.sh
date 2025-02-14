@@ -138,7 +138,7 @@ aws s3 cp /var/www/html/wp-config.php s3://saxtonator
 
 # Install chkrootkit vulnerability scanning tool
 sudo apt update
-sudo apt install chkrootkit -y
+sudo DEBIAN_FRONTEND=noninteractive apt install chkrootkit -y
 
 # Run chrootkit scanning tool
 sudo chkrootkit > vulnerability_scan_output.txt
