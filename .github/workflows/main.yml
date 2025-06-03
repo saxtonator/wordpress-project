@@ -19,7 +19,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # ✅ Conditionally refresh infrastructure via CloudFormation
+    # Conditionally refresh infrastructure via CloudFormation
     - name: Refresh infrastructure via CloudFormation
       if: ${{ github.event.inputs.refresh_infra == 'true' }}
       run: |
