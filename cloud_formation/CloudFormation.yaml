@@ -1,7 +1,10 @@
+# CloudFormation template to deploy EC2 frontend and backend instances with a shared security group,
+# Elastic IPs, and CloudWatch alarms for monitoring CPU usage, network traffic, disk I/O, and instance health.
+
 AWSTemplateFormatVersion: '2010-09-09'
 
 Resources:
-  # Security Group for EC2 instances allowing necessary ports
+  # Shared Security Group allowing common traffic for frontend and backend
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -10,7 +13,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22  # SSH access
           ToPort: 22
-          CidrIp: 0.0.0.0/0  # Open to all, consider restricting to your IP
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 80  # HTTP access
           ToPort: 80
@@ -20,57 +23,204 @@ Resources:
           ToPort: 443
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
-          FromPort: 3306  # MySQL database access
+          FromPort: 3306  # MySQL access (backend DB)
           ToPort: 3306
-          CidrIp: 0.0.0.0/0  # Consider restricting to specific backend services
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-        - IpProtocol: -1  # Allows all outbound traffic
+        - IpProtocol: -1  # Allow all outbound traffic
           CidrIp: 0.0.0.0/0
 
   # Frontend EC2 instance
   FrontendInstance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro  # Change if a different instance type is required
-      ImageId: ami-091f18e98bc129c4e  # Ubuntu Server 24.04 AMI, update if needed
-      KeyName: Sax-Admin-Key-001  # Ensure this key pair exists in AWS
+      InstanceType: t2.micro
+      ImageId: ami-091f18e98bc129c4e
+      KeyName: Sax-Admin-Key-001
       SecurityGroupIds:
-        - !Ref EC2SecurityGroup  # Attach security group
-      IamInstanceProfile: EC2S3AccessRole  # Ensure this IAM role exists in AWS
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: EC2S3AccessRole
       Tags:
         - Key: Name
-          Value: frontend-webserver  # Label for the instance
+          Value: frontend-webserver
 
   # Backend EC2 instance
   BackendInstance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro  # Change if needed
-      ImageId: ami-091f18e98bc129c4e  # Ubuntu Server 24.04 AMI, update if necessary
-      KeyName: Sax-Admin-Key-001  # Ensure this key pair exists in AWS
+      InstanceType: t2.micro
+      ImageId: ami-091f18e98bc129c4e
+      KeyName: Sax-Admin-Key-001
       SecurityGroupIds:
-        - !Ref EC2SecurityGroup  # Attach security group
-      IamInstanceProfile: EC2S3AccessRole  # Ensure this IAM role exists in AWS
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: EC2S3AccessRole
       Tags:
         - Key: Name
-          Value: backend-db  # Label for the instance
+          Value: backend-db
 
-  # Associate reserved Elastic IP with Frontend instance
+  # Associate static Elastic IP to frontend instance
   FrontendElasticIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      InstanceId: !Ref FrontendInstance  # Attach to the frontend instance
-      AllocationId: eipalloc-046e45f42eb8fbad0  # Ensure this Elastic IP exists in AWS
+      InstanceId: !Ref FrontendInstance
+      AllocationId: eipalloc-046e45f42eb8fbad0
 
-  # Associate reserved Elastic IP with Backend instance
+  # Associate static Elastic IP to backend instance
   BackendElasticIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      InstanceId: !Ref BackendInstance  # Attach to the backend instance
-      AllocationId: eipalloc-08a161070cb99fad0  # Ensure this Elastic IP exists in AWS
+      InstanceId: !Ref BackendInstance
+      AllocationId: eipalloc-08a161070cb99fad0
+
+  ### CloudWatch Alarms for FrontendInstance
+
+  # Alarm: CPU usage exceeds 80%
+  CPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "CPU usage exceeds 80%"
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref FrontendInstance
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  # Alarm: NetworkOut exceeds 500MB over 5 minutes
+  NetworkOutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "NetworkOut exceeds 500MB"
+      Namespace: AWS/EC2
+      MetricName: NetworkOut
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref FrontendInstance
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 524288000
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  # Alarm: Write operations as a proxy for high disk I/O
+  DiskUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "VolumeWriteOps as a proxy for high disk I/O"
+      Namespace: AWS/EC2
+      MetricName: VolumeWriteOps
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref FrontendInstance
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1000
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  # Alarm: Instance health check failure
+  StatusCheckAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "EC2 instance failed status check"
+      Namespace: AWS/EC2
+      MetricName: StatusCheckFailed
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref FrontendInstance
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  ### CloudWatch Alarms for BackendInstance
+
+  # Alarm: CPU usage exceeds 80%
+  BackendCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Backend CPU usage exceeds 80%"
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref BackendInstance
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  # Alarm: NetworkOut exceeds 500MB over 5 minutes
+  BackendNetworkOutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Backend NetworkOut exceeds 500MB"
+      Namespace: AWS/EC2
+      MetricName: NetworkOut
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref BackendInstance
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 524288000
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  # Alarm: Write operations as a proxy for high disk I/O
+  BackendDiskUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Backend VolumeWriteOps as a proxy for high disk I/O"
+      Namespace: AWS/EC2
+      MetricName: VolumeWriteOps
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref BackendInstance
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1000
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
+
+  # Alarm: Instance health check failure
+  BackendStatusCheckAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Backend EC2 instance failed status check"
+      Namespace: AWS/EC2
+      MetricName: StatusCheckFailed
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref BackendInstance
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      TreatMissingData: notBreaching
 
 Outputs:
-  # Outputs instance IDs for reference
   FrontendInstanceId:
     Description: Instance ID of the frontend web server
     Value: !Ref FrontendInstance
@@ -78,4 +228,3 @@ Outputs:
   BackendInstanceId:
     Description: Instance ID of the backend database server
     Value: !Ref BackendInstance
- 
