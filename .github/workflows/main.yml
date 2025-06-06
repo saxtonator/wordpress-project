@@ -57,6 +57,19 @@ jobs:
     - name: Run setup script
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_IP }} 'sudo sh /home/ubuntu/wordpress-project/bash_scripts/frontend.sh'
+    
+    # OPTIONAL: Unit test PHP syntax in custom plugin
+    # Uncomment and update the path if you want to run a basic syntax check
+    # on a specific PHP plugin or directory post-deployment.
+    #
+    # Replace /var/www/html/wp-content/plugins/your-plugin-folder
+    # with the actual path to your plugin or PHP files.
+
+    # - name: Unit test PHP syntax in plugin
+    #   run: |
+    #     ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
+    #       ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_IP }} \
+    #       'find /var/www/html/wp-content/plugins/your-plugin-folder -name "*.php" -exec php -l {} \;'
 
     # Backend
     - name: Debug BE SSH connection
